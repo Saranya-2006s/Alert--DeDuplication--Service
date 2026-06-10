@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  db:
+    image: ankane/pgvector:latest
+    container_name: postgres_vector_db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: alert_dedupe
+      POSTGRES_USER: alert_user
+      POSTGRES_PASSWORD: alert_password_secured
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alert_user -d alert_dedupe"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama_llm_service
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  backend:
+    build: .
+    container_name: fastapi_dedupe_agent
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://alert_user:alert_password_secured@db:5432/alert_dedupe
+      - OLLAMA_URL=http://ollama:11434
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+
+volumes:
+  postgres_data:
+  ollama_data:

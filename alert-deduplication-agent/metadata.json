@@ -1,0 +1,6 @@
+{
+  "name": "Alert Deduplication Agent",
+  "description": "A real-time AI-powered Alert Deduplication Dashboard and Configurator that groups duplicate infrastructure alerts, provides summary reasoning, and analyzes system health.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
